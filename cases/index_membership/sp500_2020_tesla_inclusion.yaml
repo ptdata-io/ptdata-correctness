@@ -1,0 +1,20 @@
+case: sp500_2020_tesla_inclusion
+tool: get_index_constituents
+description: >
+  S&P 500 membership must reflect Tesla's (TSLA) inclusion effective 2020-12-21: absent as
+  known on 2020-12-18, present as known on 2020-12-21.
+provenance: |
+  Tesla was added to the S&P 500 effective at the open on Monday 2020-12-21 (announced
+  2020-11-16). A point-in-time query must exclude TSLA before the effective date and include
+  it on/after it — testing the announce-ahead distinction (effective date, not announcement
+  date, governs membership unless queried by announcement knowledge).
+steps:
+  - request: {index: SP500, as_of_date: "2020-12-18"}
+    expect:
+      - {path: tickers, op: not_contains, value: TSLA}
+  - request: {index: SP500, as_of_date: "2020-12-21"}
+    expect:
+      - {path: tickers, op: contains, value: TSLA}
+cross:
+  - {left: "0.tickers", op: ne, right: "1.tickers"}
+lineage_required: true

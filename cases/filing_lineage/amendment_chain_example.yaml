@@ -1,0 +1,21 @@
+case: amendment_chain_example
+tool: get_filing_metadata
+description: >
+  An amended filing (form 10-K/A) must expose its amendment linkage: amends_accession points
+  to the accession of the filing it amends, forming a traversable chain.
+provenance: |
+  Amendment chains are the lineage backbone for restatements. This case uses GE's FY2017
+  filing family (CIK 0000040545), which includes amendment(s) to the original 10-K. The
+  asserted invariant is structural: a 10-K/A returns a non-empty amends_accession resolving
+  to a prior filing of the same company/period.
+  # VERIFY: confirm GE has a 10-K/A in this window and capture exact accession numbers.
+request:
+  ticker: GE
+  as_of_date: "2019-03-01"
+  form_type: "10-K/A"
+expect:
+  - {path: "filings[0].form_type", op: eq, value: "10-K/A"}
+  - {path: "filings[0].accession_number", op: exists}
+  - {path: "filings[0].amends_accession", op: exists,
+     source: "10-K/A amends the original FY2017 10-K"}
+lineage_required: true

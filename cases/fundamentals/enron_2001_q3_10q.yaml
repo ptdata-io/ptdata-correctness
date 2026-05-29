@@ -1,0 +1,25 @@
+case: enron_2001_q3_10q
+tool: get_fundamentals
+description: >
+  Enron Q3 2001 fundamentals as known in mid-November 2001 must return the figures as
+  reported at the time, with lineage to the period's filing — not values implied by the
+  later forensic unwinding of Enron's accounting.
+provenance: |
+  Enron reported Q3 2001 results on 2001-10-16 and filed its Q3 10-Q on 2001-11-19; it
+  declared bankruptcy on 2001-12-02. Enron also announced a restatement of 1997-2001 results
+  on 2001-11-08. This case asserts the point-in-time mechanism: a query as of the chosen date
+  returns the version of the Q3-2001 fact that was on the record then, with lineage, and the
+  store does not retroactively substitute post-collapse forensic figures.
+  # NOTE: the 2001-11-08 restatement complicates the exact as_of choice; finalize the as_of
+  # date and expected figures against EDGAR (Enron CIK 0001024401) before locking this case.
+request:
+  ticker: ENE
+  as_of_date: "2001-11-20"
+  metrics: [revenue, net_income]
+expect:
+  - {path: metrics.revenue.fiscal_year, op: eq, value: 2001}
+  - {path: metrics.revenue.fiscal_period, op: eq, value: Q3}
+  - {path: metrics.revenue.value, op: exists}
+  - {path: metrics.revenue.source_accession, op: exists,
+     source: "Enron Q3 2001 10-Q, EDGAR CIK 0001024401"}
+lineage_required: true

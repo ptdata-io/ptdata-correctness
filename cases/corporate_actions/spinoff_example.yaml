@@ -1,0 +1,21 @@
+case: spinoff_example
+tool: get_corporate_actions
+description: >
+  A spinoff must be represented as a corporate action on the parent, linked to the child
+  security, with the distribution (ex) date — enabling point-in-time price adjustment and
+  lineage across the separation.
+provenance: |
+  Example: eBay (EBAY) distributed PayPal (PYPL) to shareholders, ex-date 2015-07-17. A
+  spinoff corporate action on the parent should record the ex-date and link to the child
+  security via related_security. Used here as the canonical spinoff shape.
+  # VERIFY: exact distribution ratio and confirm ex-date against the EBAY 8-K before locking.
+request:
+  ticker: EBAY
+  start: "2015-07-01"
+  end: "2015-07-31"
+expect:
+  - {path: "actions[0].action_type", op: eq, value: spinoff}
+  - {path: "actions[0].ex_date", op: eq, value: "2015-07-17"}
+  - {path: "actions[0].related_security", op: contains, value: PYPL,
+     source: "PayPal spun off from eBay, 2015-07-17"}
+lineage_required: true

@@ -1,0 +1,23 @@
+case: worldcom_2002_10q
+tool: get_fundamentals
+description: >
+  WorldCom Q1 2002 fundamentals as known before the June 2002 fraud disclosure must return
+  the originally-reported figures, not the later restated values that removed the improperly
+  capitalized line costs.
+provenance: |
+  WorldCom filed its Q1 2002 10-Q in spring 2002. On 2002-06-25 it disclosed ~$3.8B of
+  improperly capitalized line costs, triggering massive restatements. A point-in-time query
+  dated before the disclosure must return the original Q1-2002 figures with lineage to the
+  original filing; a later as_of would return the restated version.
+  # VERIFY: exact figures and accession number against EDGAR (WorldCom CIK 0000723527).
+request:
+  ticker: WCOM
+  as_of_date: "2002-06-01"
+  metrics: [revenue, net_income]
+expect:
+  - {path: metrics.revenue.fiscal_year, op: eq, value: 2002}
+  - {path: metrics.revenue.fiscal_period, op: eq, value: Q1}
+  - {path: metrics.net_income.value, op: exists}
+  - {path: metrics.net_income.source_accession, op: exists,
+     source: "WorldCom Q1 2002 10-Q, original (pre-restatement)"}
+lineage_required: true

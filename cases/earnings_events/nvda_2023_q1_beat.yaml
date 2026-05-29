@@ -1,0 +1,32 @@
+case: nvda_2023_q1_beat
+tool: get_earnings_event
+description: >
+  NVIDIA Q1 FY2024 (announced after close 2023-05-24): assert the 8-K acceptance timestamp
+  is present, as-reported revenue matches the press release, the pre-announcement
+  options-implied expected move (T-1) is present, and the realized T+1 reaction (~+24%)
+  exceeds the move the options market had priced in — the "blowout" relative to expectation.
+provenance: |
+  NVIDIA reported Q1 FY2024 on 2023-05-24 after the close; revenue ~$7.19B; the stock gapped
+  up roughly +24% on 2023-05-25 on the AI-driven guidance. The point-in-time claim: the
+  expected move is read from the option chain as it stood at the 2023-05-23 close (T-1), and
+  the realized reaction materially exceeded it. Expected-move magnitude is not hard-coded
+  (it depends on the chosen options source/method); the falsifiable assertion is realized > implied.
+  # VERIFY: exact as-reported revenue/EPS against the 2023-05-24 press release / 8-K.
+request:
+  ticker: NVDA
+  fiscal_year: 2024
+  fiscal_period: Q1
+  window: [-5, 5]
+expect:
+  - {path: sec_acceptance_ts, op: exists}
+  - {path: filing_accession, op: exists, source: "NVDA 8-K Item 2.02, 2023-05-24"}
+  - {path: as_reported.revenue, op: approx, value: 7.19e9, tol: 0.03,
+     source: "NVDA Q1 FY2024 press release"}
+  - {path: implied_expectation.expected_move_pct, op: exists}
+  - {path: price_reaction.t_plus_1_return, op: approx, value: 0.24, tol: 0.12,
+     source: "close 2023-05-24 -> 2023-05-25"}
+  # The defining claim: realized move exceeded the options-implied expected move.
+  - {path: price_reaction.t_plus_1_return, op: gt, value: 0.0}
+cross:
+  - {left: "price_reaction.t_plus_1_return", op: gt, right: "implied_expectation.expected_move_pct"}
+lineage_required: true

@@ -1,0 +1,28 @@
+case: meta_2021_q4_miss
+tool: get_earnings_event
+description: >
+  Meta Platforms Q4 2021 (announced after close 2022-02-02): assert the 8-K acceptance
+  timestamp, as-reported revenue, presence of the pre-announcement options-implied expected
+  move, and a large negative T+1 reaction (~-26%) reflecting the historic selloff.
+provenance: |
+  Meta reported Q4 2021 on 2022-02-02 after the close; revenue ~$33.67B; weak DAU/guidance
+  triggered a ~-26% drop on 2022-02-03 (then the largest one-day market-cap loss in US
+  history). Ticker was FB at the time (renamed META 2022-06-09) — the security-identifier
+  history must resolve FB for this date. The realized drawdown magnitude exceeded the
+  options-implied expected move.
+  # VERIFY: exact as-reported revenue/EPS against the 2022-02-02 press release / 8-K.
+request:
+  ticker: FB
+  fiscal_year: 2021
+  fiscal_period: Q4
+  window: [-5, 5]
+expect:
+  - {path: sec_acceptance_ts, op: exists}
+  - {path: filing_accession, op: exists, source: "Meta/FB 8-K Item 2.02, 2022-02-02"}
+  - {path: as_reported.revenue, op: approx, value: 33.67e9, tol: 0.03,
+     source: "Meta Q4 2021 press release"}
+  - {path: implied_expectation.expected_move_pct, op: exists}
+  - {path: price_reaction.t_plus_1_return, op: approx, value: -0.26, tol: 0.15,
+     source: "close 2022-02-02 -> 2022-02-03"}
+  - {path: price_reaction.t_plus_1_return, op: lt, value: -0.15}
+lineage_required: true

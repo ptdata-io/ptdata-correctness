@@ -1,0 +1,21 @@
+case: sp500_2008_lehman_dropout
+tool: get_index_constituents
+description: >
+  S&P 500 membership must be point-in-time: Lehman Brothers (LEH) is a constituent as known
+  on 2008-09-14 and is absent as known on 2008-09-22. Survivorship bias would wrongly omit
+  LEH from the earlier date.
+provenance: |
+  Lehman Brothers filed for bankruptcy on 2008-09-15 and was removed from the S&P 500 shortly
+  after (replaced ~2008-09-22). A point-in-time constituents query must include LEH for dates
+  when it was a member and exclude it afterward.
+steps:
+  - request: {index: SP500, as_of_date: "2008-09-14"}
+    expect:
+      - {path: tickers, op: contains, value: LEH}
+  - request: {index: SP500, as_of_date: "2008-09-22"}
+    expect:
+      - {path: tickers, op: not_contains, value: LEH}
+cross:
+  # The two queries must genuinely differ on LEH (the falsifiable point-in-time claim).
+  - {left: "0.tickers", op: ne, right: "1.tickers"}
+lineage_required: true

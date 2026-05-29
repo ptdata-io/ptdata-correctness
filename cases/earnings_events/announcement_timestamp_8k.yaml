@@ -1,0 +1,27 @@
+case: announcement_timestamp_8k
+tool: get_earnings_event
+description: >
+  For a recent earnings event, the reported SEC acceptance timestamp must be exact (to the
+  second) and internally consistent with the linked 8-K filing's acceptance_datetime, and
+  the dissemination-time handling (wire/press-release time + confidence flag) must be present.
+provenance: |
+  This case pins the timestamp contract. The 8-K SEC acceptance time is published by EDGAR to
+  the second; ptdata's earnings-event sec_acceptance_ts must equal the acceptance_datetime of
+  the linked 8-K (cross-field consistency, verifiable now). The exact wall-clock value is to
+  be locked against EDGAR for the chosen event. Crucially, sec_acceptance_ts is the FILING
+  acceptance, not necessarily the market-dissemination time — so dissemination_ts and
+  dissemination_confidence must also be present and distinguished. Uses AAPL FY2023 Q4
+  (announced 2023-11-02) as the reference event.
+  # VERIFY: capture AAPL's 8-K acceptance_datetime from EDGAR and assert it with op:eq once known.
+request:
+  ticker: AAPL
+  fiscal_year: 2023
+  fiscal_period: Q4
+expect:
+  - {path: sec_acceptance_ts, op: exists}
+  - {path: filing_accession, op: exists, source: "AAPL 8-K Item 2.02, 2023-11-02"}
+  - {path: dissemination_confidence, op: exists}
+cross:
+  # The event timestamp must match the linked filing's acceptance time exactly.
+  - {left: "sec_acceptance_ts", op: eq, right: "filing.acceptance_datetime"}
+lineage_required: true

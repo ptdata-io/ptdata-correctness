@@ -1,0 +1,28 @@
+case: aapl_2014_split
+tool: get_price_history
+description: >
+  AAPL prices across the 7-for-1 split (ex-date 2014-06-09) must return both unadjusted and
+  adjusted values with explicit adjustment metadata: pre-split bars carry a cumulative
+  split-adjustment factor of 7.0; post-split bars carry 1.0. Raw prices are never mutated.
+provenance: |
+  Apple executed a 7-for-1 stock split with ex-date 2014-06-09 (announced 2014-04-23). The
+  split ratio and ex-date are matters of public record and are asserted exactly. Exact price
+  levels are not asserted (to avoid encoding a price feed we cannot verify offline); the
+  invariant asserted is the adjustment RELATIONSHIP and metadata, which is what point-in-time
+  correctness turns on.
+request:
+  ticker: AAPL
+  start: "2014-06-06"
+  end: "2014-06-10"
+  adjustment_mode: split
+  as_of_date: "2014-12-31"
+expect:
+  - {path: "corporate_actions[0].action_type", op: eq, value: split}
+  - {path: "corporate_actions[0].ex_date", op: eq, value: "2014-06-09"}
+  - {path: "corporate_actions[0].split_ratio", op: approx, value: 7.0, tol: 0.001}
+  # First bar (2014-06-06, the trading day before ex-date) is pre-split: factor 7.0.
+  - {path: "bars[0].date", op: eq, value: "2014-06-06"}
+  - {path: "bars[0].adjustment_factor", op: approx, value: 7.0, tol: 0.001}
+  - {path: "bars[0].raw_close", op: exists}
+  - {path: "bars[0].adj_close", op: exists}
+lineage_required: true

@@ -1,0 +1,23 @@
+case: ge_2017_10k_restated
+tool: get_fundamentals
+description: >
+  GE fiscal-2017 fundamentals as known on 2019-03-01 must return the RESTATED figures, and
+  the lineage must expose the amendment chain linking the restatement to the original 10-K.
+provenance: |
+  By 2019-03-01, GE's FY2017 figures had been restated (the restatement(s) became known
+  during 2018-2019). A point-in-time query for 2019-03-01 must therefore return the restated
+  version — a different knowledge-time version of the same valid-time fact (FY2017) — with
+  lineage showing the amendment chain (restating filing -> original 10-K via amends_accession).
+  # VERIFY before finalizing: restated FY2017 figures and the restating accession number.
+request:
+  ticker: GE
+  as_of_date: "2019-03-01"
+  metrics: [revenue, net_income]
+expect:
+  - {path: metrics.revenue.fiscal_year, op: eq, value: 2017}
+  - {path: metrics.revenue.value, op: exists}
+  - {path: metrics.revenue.source_accession, op: exists}
+  # The lineage must demonstrate this is a restatement linked back to the original filing.
+  - {path: lineage.amends_chain, op: exists,
+     source: "restating filing's amends_accession chain to the original FY2017 10-K"}
+lineage_required: true

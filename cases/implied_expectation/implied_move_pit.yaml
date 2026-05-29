@@ -1,0 +1,31 @@
+case: implied_move_pit
+tool: get_implied_expectation
+description: >
+  The options-implied expected move for the same upcoming event, queried as of two different
+  dates spanning the pre-earnings IV ramp, must return DIFFERENT values — and must reflect
+  only information available on each as_of date (point-in-time). This is the options-side
+  analogue of the consensus-revision test: same target, two knowledge dates, divergent values.
+provenance: |
+  Implied volatility (and therefore the implied expected move) typically rises into an
+  earnings announcement. For NVIDIA's Q1 FY2024 event (2023-05-24), the implied move read on
+  2023-05-10 should differ from — and generally be lower than — the move read at the 2023-05-23
+  close (T-1), because the latter incorporates the IV ramp. Each value must be computed only
+  from the option chain available on its as_of date; neither may peek at the post-event chain.
+  # VERIFY: confirm direction/magnitude once the options source is ingested; the falsifiable
+  # core asserted here is that the two as_of values differ (and T-1 >= earlier).
+steps:
+  - request: {ticker: NVDA, as_of_date: "2023-05-10", target_event: "2024-Q1"}
+    expect:
+      - {path: expected_move_pct, op: exists}
+      - {path: as_of_date, op: eq, value: "2023-05-10"}
+      - {path: method, op: exists}
+  - request: {ticker: NVDA, as_of_date: "2023-05-23", target_event: "2024-Q1"}
+    expect:
+      - {path: expected_move_pct, op: exists}
+      - {path: as_of_date, op: eq, value: "2023-05-23"}
+cross:
+  # Different knowledge dates -> different implied move (the point-in-time guarantee).
+  - {left: "0.expected_move_pct", op: ne, right: "1.expected_move_pct"}
+  # IV ramps into earnings: T-1 implied move >= the earlier reading.
+  - {left: "1.expected_move_pct", op: gt, right: "0.expected_move_pct"}
+lineage_required: true
