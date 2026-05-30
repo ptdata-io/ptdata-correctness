@@ -16,6 +16,8 @@ request:
   ticker: GE
   as_of_date: "2018-02-28"
   metrics: [revenue, net_income]
+  fiscal_year: 2017
+  fiscal_period: FY
 expect:
   - {path: metrics.revenue.fiscal_year, op: eq, value: 2017}
   - {path: metrics.revenue.fiscal_period, op: eq, value: FY}

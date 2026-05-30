@@ -105,9 +105,11 @@ def check_expectations(response: dict, case: dict):
 
         if op == "exists":
             try:
-                _resolve(response, path)
+                value = _resolve(response, path)
             except (KeyError, IndexError, TypeError):
                 pytest.fail(f"{label}: expected present, was missing")
+            if value is None:
+                pytest.fail(f"{label}: expected present and non-null, was null")
         elif op == "absent":
             try:
                 _resolve(response, path)
