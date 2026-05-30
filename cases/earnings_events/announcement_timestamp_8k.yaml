@@ -10,13 +10,14 @@ provenance: |
   the linked 8-K (cross-field consistency, verifiable now). The exact wall-clock value is to
   be locked against EDGAR for the chosen event. Crucially, sec_acceptance_ts is the FILING
   acceptance, not necessarily the market-dissemination time — so dissemination_ts and
-  dissemination_confidence must also be present and distinguished. Uses AAPL FY2023 Q4
-  (announced 2023-11-02) as the reference event.
+  dissemination_confidence must also be present and distinguished. Uses AAPL FY2023
+  (the Q4/annual announcement, 2023-11-02) as the reference event — attributed to FY because
+  the announcement accompanies the annual 10-K (see methodology docs/06).
   # VERIFY: capture AAPL's 8-K acceptance_datetime from EDGAR and assert it with op:eq once known.
 request:
   ticker: AAPL
   fiscal_year: 2023
-  fiscal_period: Q4
+  fiscal_period: FY
 expect:
   - {path: sec_acceptance_ts, op: exists}
   - {path: filing_accession, op: exists, source: "AAPL 8-K Item 2.02, 2023-11-02"}
