@@ -5,22 +5,26 @@ description: >
   second) and internally consistent with the linked 8-K filing's acceptance_datetime, and
   the dissemination-time handling (wire/press-release time + confidence flag) must be present.
 provenance: |
-  This case pins the timestamp contract. The 8-K SEC acceptance time is published by EDGAR to
-  the second; ptdata's earnings-event sec_acceptance_ts must equal the acceptance_datetime of
-  the linked 8-K (cross-field consistency, verifiable now). The exact wall-clock value is to
-  be locked against EDGAR for the chosen event. Crucially, sec_acceptance_ts is the FILING
-  acceptance, not necessarily the market-dissemination time — so dissemination_ts and
-  dissemination_confidence must also be present and distinguished. Uses AAPL FY2023
-  (the Q4/annual announcement, 2023-11-02) as the reference event — attributed to FY because
-  the announcement accompanies the annual 10-K (see methodology docs/06).
-  # VERIFY: capture AAPL's 8-K acceptance_datetime from EDGAR and assert it with op:eq once known.
+  This case pins the timestamp contract. Apple's FY2023 Q4/annual results 8-K (Item 2.02)
+  was accepted by EDGAR at 2023-11-02T20:30:32Z (16:30:32 ET, just after the close;
+  accession 0000320193-23-000104, items 2.02,9.01 — verified against EDGAR). ptdata's
+  earnings-event sec_acceptance_ts must equal that to the second and match the linked 8-K's
+  acceptance_datetime (cross-field consistency). Crucially, sec_acceptance_ts is the FILING
+  acceptance, not necessarily the market-dissemination time — so dissemination_confidence
+  must be present and distinguished (currently 'unknown' pending the options/wire work, 6f).
+  Attributed to FY because the announcement accompanies the annual report (see docs/06).
+  As-reported FY2023 net sales were $383,285,000,000 (Apple FY ended 2023-09-30).
 request:
   ticker: AAPL
   fiscal_year: 2023
   fiscal_period: FY
 expect:
-  - {path: sec_acceptance_ts, op: exists}
-  - {path: filing_accession, op: exists, source: "AAPL 8-K Item 2.02, 2023-11-02"}
+  - {path: sec_acceptance_ts, op: eq, value: "2023-11-02T20:30:32Z",
+     source: "AAPL 8-K Item 2.02 EDGAR acceptance, accn 0000320193-23-000104"}
+  - {path: filing_accession, op: eq, value: "0000320193-23-000104",
+     source: "AAPL 8-K Item 2.02, 2023-11-02"}
+  - {path: as_reported.revenue, op: eq, value: 383285000000,
+     source: "AAPL FY2023 10-K/press release net sales"}
   - {path: dissemination_confidence, op: exists}
 cross:
   # The event timestamp must match the linked filing's acceptance time exactly.

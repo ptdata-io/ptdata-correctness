@@ -2,16 +2,16 @@ case: ge_2017_10k_original
 tool: get_fundamentals
 description: >
   GE fiscal-2017 fundamentals as known on 2018-02-28 must return the ORIGINAL figures from
-  the FY2017 10-K (filed Feb 2018), not the values GE later restated. This is the core
+  the FY2017 10-K (filed 2018-02-23), not the values GE later restated. This is the core
   point-in-time guarantee for fundamentals.
 provenance: |
-  General Electric filed its FY2017 Form 10-K in late February 2018. GE subsequently
-  restated prior-period results (insurance reserve charge disclosed Jan 2018; ASC 606 and
-  other restatements through 2018-2019). On 2018-02-28 only the original 10-K existed, so a
-  point-in-time query for that date must return the original values with lineage pointing at
-  the original 10-K accession.
-  # VERIFY before finalizing: exact original FY2017 revenue/net-income figures and the
-  # original 10-K accession number, against EDGAR (CIK 0000040545).
+  General Electric filed its FY2017 Form 10-K on 2018-02-23 (EDGAR CIK 0000040545, accession
+  0000040545-18-000014, period 2017-12-31; verified against EDGAR). The as-reported XBRL
+  figures in that filing are total revenues us-gaap:Revenues = $122,092,000,000 and
+  us-gaap:NetIncomeLoss = -$5,786,000,000 (the 2017 net loss attributable to GE, driven by
+  the insurance reserve charge). GE subsequently restated/recast prior-period results through
+  2018-2019. On 2018-02-28 only the original 10-K existed, so a point-in-time query for that
+  date must return these original values with lineage pointing at the original 10-K accession.
 request:
   ticker: GE
   as_of_date: "2018-02-28"
@@ -21,8 +21,12 @@ request:
 expect:
   - {path: metrics.revenue.fiscal_year, op: eq, value: 2017}
   - {path: metrics.revenue.fiscal_period, op: eq, value: FY}
-  - {path: metrics.revenue.value, op: exists}
-  - {path: metrics.revenue.source_accession, op: exists,
+  - {path: metrics.revenue.value, op: eq, value: 122092000000,
+     source: "GE FY2017 10-K, us-gaap:Revenues, EDGAR accn 0000040545-18-000014"}
+  - {path: metrics.revenue.source_accession, op: eq, value: "0000040545-18-000014",
      source: "original FY2017 10-K, EDGAR CIK 0000040545"}
   - {path: metrics.revenue.methodology_version, op: exists}
+  - {path: metrics.net_income.value, op: eq, value: -5786000000,
+     source: "GE FY2017 10-K, us-gaap:NetIncomeLoss, EDGAR accn 0000040545-18-000014"}
+  - {path: metrics.net_income.source_accession, op: eq, value: "0000040545-18-000014"}
 lineage_required: true

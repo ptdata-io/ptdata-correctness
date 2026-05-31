@@ -1,21 +1,26 @@
 case: amendment_chain_example
 tool: get_filing_metadata
 description: >
-  An amended filing (form 10-K/A) must expose its amendment linkage: amends_accession points
-  to the accession of the filing it amends, forming a traversable chain.
+  An amended annual report (form 10-K/A) must expose its amendment linkage: amends_accession
+  points to the accession of the same-period filing it amends, forming a traversable chain.
 provenance: |
-  Amendment chains are the lineage backbone for restatements. This case uses GE's FY2017
-  filing family (CIK 0000040545), which includes amendment(s) to the original 10-K. The
-  asserted invariant is structural: a 10-K/A returns a non-empty amends_accession resolving
-  to a prior filing of the same company/period.
-  # VERIFY: confirm GE has a 10-K/A in this window and capture exact accession numbers.
+  Amendment chains are the lineage backbone for restatements. GE (EDGAR CIK 0000040545) filed
+  a 10-K/A on 2007-01-19 (accession 0000040545-07-000007, period 2005-12-31) amending its
+  original FY2005 Form 10-K (accession 0000040545-06-000009, filed 2006-03-03, period
+  2005-12-31) — both verified against EDGAR. As known on 2019-03-01, GE's most recent 10-K/A
+  is this filing (GE filed no 10-K/A for FY2017). The asserted invariant is structural: the
+  10-K/A returns a non-empty amends_accession resolving to the company's prior same-period
+  10-K. (NOTE: this is GE's FY2005 amendment chain; GE's later accounting restatements were
+  effected by recast comparatives in subsequent 10-Ks, not by a 10-K/A.)
 request:
   ticker: GE
   as_of_date: "2019-03-01"
   form_type: "10-K/A"
 expect:
   - {path: "filings[0].form_type", op: eq, value: "10-K/A"}
-  - {path: "filings[0].accession_number", op: exists}
-  - {path: "filings[0].amends_accession", op: exists,
-     source: "10-K/A amends the original FY2017 10-K"}
+  - {path: "filings[0].accession_number", op: eq, value: "0000040545-07-000007",
+     source: "GE 10-K/A filed 2007-01-19, EDGAR CIK 0000040545"}
+  - {path: "filings[0].period_of_report", op: eq, value: "2005-12-31"}
+  - {path: "filings[0].amends_accession", op: eq, value: "0000040545-06-000009",
+     source: "amends the original FY2005 10-K (filed 2006-03-03)"}
 lineage_required: true
