@@ -172,9 +172,14 @@ def _cross(responses: list, spec: dict, file: str):
 def run_case(client: httpx.Client, case: dict):
     """Run a golden file: a single request, or a multi-step case with cross-step assertions.
 
+    A case with a top-level `skip:` field is skipped with that reason (used for cases that are
+    out of the current product scope — documented, not silently failing).
+
     Multi-step form (for point-in-time divergence demos): `steps` is a list of {request,
     expect}; an optional `cross` list compares paths across the collected step responses.
     """
+    if case.get("skip"):
+        pytest.skip(case["skip"])
     if "steps" in case:
         responses = []
         for i, step in enumerate(case["steps"]):

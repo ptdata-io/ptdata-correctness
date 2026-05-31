@@ -1,4 +1,5 @@
 case: ge_2017_10k_restated
+skip: "no FY2017 headline restatement in companyfacts; restatement mechanics covered by server tests"
 tool: get_fundamentals
 description: >
   GE fiscal-2017 fundamentals as known on 2019-03-01 must return the RESTATED figures, and

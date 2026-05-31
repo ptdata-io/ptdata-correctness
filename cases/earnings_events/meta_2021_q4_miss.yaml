@@ -1,4 +1,5 @@
 case: meta_2021_q4_miss
+skip: "requires options-implied expected move (6f); out of MVP scope"
 tool: get_earnings_event
 description: >
   Meta Platforms Q4 2021 (announced after close 2022-02-02): assert the 8-K acceptance

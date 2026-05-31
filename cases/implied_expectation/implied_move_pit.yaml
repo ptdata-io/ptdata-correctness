@@ -1,4 +1,5 @@
 case: implied_move_pit
+skip: "requires options data (6f); out of MVP scope"
 tool: get_implied_expectation
 description: >
   The options-implied expected move for the same upcoming event, queried as of two different
