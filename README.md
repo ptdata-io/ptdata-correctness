@@ -6,7 +6,7 @@ documents.**
 
 Point-in-time data is only trustworthy if its claims are *falsifiable*. Every test here is a
 golden file — a specific, historically-grounded claim ("Lehman was in the S&P 500 on
-2008-09-14 and not on 2008-09-22"; "GE's FY2017 figures as known on 2018-02-28 are the
+2008-09-15 and not on 2008-09-16"; "GE's FY2017 figures as known on 2018-02-28 are the
 original, not the restated") — that either passes against the live service or fails visibly.
 If we are wrong, these go red.
 
@@ -19,13 +19,17 @@ pip install -r requirements.txt
 
 # Point at the service. Use the public endpoint, or your own local dev server.
 export PTDATA_BASE_URL="https://api.ptdata.example"   # default: http://localhost:8000
-export PTDATA_API_KEY="ptk_..."                        # free key; omit if not required
+# The read surface is OPEN — no API key required (it is per-IP rate limited). If a future
+# tier issues keys, set PTDATA_API_KEY and the suite will send it as a Bearer token.
 
 pytest -v
 ```
 
-Until the service implements a given behavior, that test is **RED** — and that is correct.
-The golden files are the specification; the implementation chases them green.
+Cases that are out of the current product scope — pre-XBRL fundamentals, raw-price corporate
+actions, options-implied expected move (see [methodology limitations](https://github.com/ptdata/ptdata-methodology/blob/main/docs/08-known-limitations.md))
+— carry a `skip:` reason and report as **SKIPPED**, never a silent or vacuous green. In-scope
+cases are the specification: if the service is wrong, they go **RED**. Today the live suite is
+**5 passed, 8 skipped, 0 failed**.
 
 ## How it works
 
@@ -39,14 +43,14 @@ The golden files are the specification; the implementation chases them green.
 
 ## Categories
 
-| Category | What it pins |
-|---|---|
-| `fundamentals` | As-reported vs. restated, point-in-time (Enron, GE, WorldCom) |
-| `corporate_actions` | Point-in-time split/spinoff adjustment with metadata (AAPL 7-for-1) |
-| `index_membership` | Survivorship-free S&P 500 membership (Lehman, Tesla) |
-| `filing_lineage` | Amendment chains via accession linkage |
-| `earnings_events` | 8-K timestamps, as-reported figures, realized vs. options-implied move |
-| `implied_expectation` | Point-in-time options-implied expected move (divergence across as_of dates) |
+| Category | What it pins | Status |
+|---|---|---|
+| `fundamentals` | As-reported vs. restated, point-in-time | **active** (GE); Enron/WorldCom skipped (pre-XBRL) |
+| `index_membership` | Survivorship-free S&P 500 membership | **active** (Lehman, Tesla) |
+| `filing_lineage` | Amendment chains via accession linkage | **active** (GE FY2005 10-K/A) |
+| `earnings_events` | 8-K timestamps + as-reported figures | **active** timestamps/as-reported; realized-vs-implied skipped (options, 6f) |
+| `corporate_actions` | Point-in-time split/spinoff adjustment | skipped (raw prices out of redistributable scope) |
+| `implied_expectation` | Point-in-time options-implied expected move | skipped (options data, 6f) |
 
 ## Contributing
 
