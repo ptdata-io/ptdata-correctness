@@ -1,24 +1,30 @@
 case: worldcom_2002_10q
-skip: "pre-XBRL (companyfacts starts ~2009); out of MVP scope"
 tool: get_fundamentals
 description: >
-  WorldCom Q1 2002 fundamentals as known before the June 2002 fraud disclosure must return
-  the originally-reported figures, not the later restated values that removed the improperly
-  capitalized line costs.
+  WorldCom Q1 2002 fundamentals as known before the June 2002 fraud disclosure must return the
+  originally-reported (CONSOLIDATED) figures, not the later restated values that removed the
+  improperly capitalized line costs. A PARSED pre-XBRL fact, served as a labeled confidence tier.
 provenance: |
-  WorldCom filed its Q1 2002 10-Q in spring 2002. On 2002-06-25 it disclosed ~$3.8B of
-  improperly capitalized line costs, triggering massive restatements. A point-in-time query
-  dated before the disclosure must return the original Q1-2002 figures with lineage to the
-  original filing; a later as_of would return the restated version.
-  # VERIFY: exact figures and accession number against EDGAR (WorldCom CIK 0000723527).
+  WorldCom filed its Q1 2002 Form 10-Q on 2002-05-15 (EDGAR CIK 0000723527, accession
+  0000912057-02-020812). On 2002-06-25 it disclosed ~$3.8B of improperly capitalized line costs,
+  triggering massive restatements. The CONSOLIDATED statements of operations ("In Millions") report,
+  for the three months ended 2002-03-31: Revenues $8,120M and Net income $172M — the original,
+  pre-disclosure figures (NOT the $3,042M MCI-group tracking-stock subtotal). Extracted from the
+  filing text (provenance=parsed), human-verified (extraction_confidence=verified). A point-in-time
+  query dated 2002-06-01 (before the disclosure) returns these original figures with lineage.
 request:
   ticker: WCOM
   as_of_date: "2002-06-01"
   metrics: [revenue, net_income]
+  fiscal_year: 2002
+  fiscal_period: Q1
 expect:
   - {path: metrics.revenue.fiscal_year, op: eq, value: 2002}
   - {path: metrics.revenue.fiscal_period, op: eq, value: Q1}
-  - {path: metrics.net_income.value, op: exists}
-  - {path: metrics.net_income.source_accession, op: exists,
-     source: "WorldCom Q1 2002 10-Q, original (pre-restatement)"}
+  - {path: metrics.revenue.value, op: eq, value: 8120000000,
+     source: "WorldCom Q1 2002 10-Q, CONSOLIDATED statements of operations (in millions)"}
+  - {path: metrics.net_income.value, op: eq, value: 172000000,
+     source: "original pre-fraud-disclosure consolidated net income"}
+  - {path: metrics.net_income.provenance, op: eq, value: parsed}
+  - {path: metrics.net_income.source_accession, op: eq, value: "0000912057-02-020812"}
 lineage_required: true
