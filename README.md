@@ -25,11 +25,18 @@ export PTDATA_BASE_URL="https://api.ptdata.example"   # default: http://localhos
 pytest -v
 ```
 
-Cases that are out of the current product scope — pre-XBRL fundamentals, raw-price corporate
-actions, options-implied expected move (see [methodology limitations](https://github.com/ptdata/ptdata-methodology/blob/main/docs/08-known-limitations.md))
+Cases that are out of the current product scope — raw-price corporate actions, options-implied
+expected move (see [methodology limitations](https://github.com/ptdata/ptdata-methodology/blob/main/docs/08-known-limitations.md))
 — carry a `skip:` reason and report as **SKIPPED**, never a silent or vacuous green. In-scope
 cases are the specification: if the service is wrong, they go **RED**. Today the live suite is
-**5 passed, 8 skipped, 0 failed**.
+**7 passed, 6 skipped, 0 failed**.
+
+**Confidence index on parsed facts.** Fundamentals below the XBRL era (~pre-2009) come from a
+labeled **parsed tier**: each value carries `provenance` (`xbrl` | `parsed`) and, for parsed
+values, an `extraction_confidence` of `verified` | `high` | `medium` — returned on every response
+so you can filter or weight by trust. Nothing is published below those tiers (conflicting or
+unverified extractions are withheld). The `enron_2001_q3_10q` and `worldcom_2002_10q` cases assert
+parsed values directly. Definitions: [docs/09-pre-xbrl-fundamentals.md](https://github.com/ptdata/ptdata-methodology/blob/main/docs/09-pre-xbrl-fundamentals.md).
 
 ## How it works
 
@@ -45,7 +52,7 @@ cases are the specification: if the service is wrong, they go **RED**. Today the
 
 | Category | What it pins | Status |
 |---|---|---|
-| `fundamentals` | As-reported vs. restated, point-in-time | **active** (GE); Enron/WorldCom skipped (pre-XBRL) |
+| `fundamentals` | As-reported vs. restated, point-in-time (XBRL + labeled parsed tier) | **active** (GE; Enron Q3-2001 + WorldCom Q1-2002 via the parsed tier) |
 | `index_membership` | Survivorship-free S&P 500 membership | **active** (Lehman, Tesla) |
 | `filing_lineage` | Amendment chains via accession linkage | **active** (GE FY2005 10-K/A) |
 | `earnings_events` | 8-K timestamps + as-reported figures | **active** timestamps/as-reported; realized-vs-implied skipped (options, 6f) |
