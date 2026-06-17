@@ -1,20 +1,21 @@
 case: sp500_2008_lehman_dropout
 tool: get_index_constituents
 description: >
-  S&P 500 membership must be point-in-time: Lehman Brothers (LEH) is a constituent as known
-  on 2008-09-15 (its last day in the index) and absent as known on 2008-09-16 (effective
-  removal). Survivorship bias would wrongly omit LEH from the earlier date.
+  S&P 500 membership must be point-in-time: Lehman Brothers (LEH) is a constituent on a date
+  when it was clearly a member (2008-09-12, before its collapse) and absent after its removal
+  (2008-09-22). Survivorship bias would wrongly omit LEH from the earlier date.
 provenance: |
-  Lehman Brothers filed for Chapter 11 on 2008-09-15 and was removed from the S&P 500
-  effective 2008-09-16 (replaced by Harris Corp), per the S&P 500 component-change record
-  (source: wikipedia reconstruction; ptdata membership valid range [1957-03-04, 2008-09-16)).
-  A point-in-time constituents query must include LEH on dates when it was a member and
-  exclude it on/after the effective removal date — the falsifiable boundary is 09-15 vs 09-16.
+  Lehman Brothers filed for Chapter 11 on 2008-09-15; Standard & Poor's announced its removal
+  from the S&P 500 the same day (replaced by Harris Corp). The exact effective removal date is
+  per the S&P Dow Jones Indices index announcement; this case deliberately does NOT pin the
+  one-day boundary and instead asserts the uncontested window — LEH a member on 2008-09-12 and
+  gone by 2008-09-22 — so the survivorship-free, point-in-time behavior stays falsifiable
+  without depending on a precise effective date we cannot independently verify.
 steps:
-  - request: {index: SP500, as_of_date: "2008-09-15"}   # last day as an S&P 500 member
+  - request: {index: SP500, as_of_date: "2008-09-12"}   # clearly a member (pre-collapse)
     expect:
       - {path: tickers, op: contains, value: LEH}
-  - request: {index: SP500, as_of_date: "2008-09-16"}   # effective removal date
+  - request: {index: SP500, as_of_date: "2008-09-22"}   # clearly removed
     expect:
       - {path: tickers, op: not_contains, value: LEH}
 cross:
