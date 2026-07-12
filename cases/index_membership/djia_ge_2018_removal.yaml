@@ -1,0 +1,26 @@
+case: djia_ge_2018_removal
+tool: get_index_constituents
+description: >
+  DJIA membership must be point-in-time and survivorship-free for long-tenured removals:
+  General Electric (GE) — a continuous industrial-era member — is a constituent on 2018-06-25
+  and absent on the effective removal date 2018-06-26 (replaced by Walgreens Boots Alliance).
+provenance: |
+  S&P Dow Jones Indices announced GE's removal from the Dow Jones Industrial Average effective
+  June 26, 2018 (replaced by Walgreens Boots Alliance / WBA). GE had been in the average for
+  over a century (continuous modern stint from 1907). This case pins the effective boundary
+  (present 2018-06-25, absent 2018-06-26) rather than an uncontested multi-day window, because
+  the primary effective date is uncontested in public records and matches the reconstructed
+  membership interval (GE valid_to = 2018-06-26, half-open). Survivorship-biased lists that
+  only serve today's DJIA would omit GE on the earlier date entirely.
+steps:
+  - request: {index: DJIA, as_of_date: "2018-06-25"}
+    expect:
+      - {path: tickers, op: contains, value: GE}
+      - {path: tickers, op: not_contains, value: WBA}
+  - request: {index: DJIA, as_of_date: "2018-06-26"}
+    expect:
+      - {path: tickers, op: not_contains, value: GE}
+      - {path: tickers, op: contains, value: WBA}
+cross:
+  - {left: "0.tickers", op: ne, right: "1.tickers"}
+lineage_required: true

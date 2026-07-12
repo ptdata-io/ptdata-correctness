@@ -29,7 +29,7 @@ Cases that are out of the current product scope — raw-price corporate actions,
 expected move (see [methodology limitations](https://github.com/ptdata/ptdata-methodology/blob/main/docs/08-known-limitations.md))
 — carry a `skip:` reason and report as **SKIPPED**, never a silent or vacuous green. In-scope
 cases are the specification: if the service is wrong, they go **RED**. Today the live suite is
-**7 passed, 6 skipped, 0 failed**.
+**9 passed, 6 skipped, 0 failed**.
 
 **Confidence index on parsed facts.** Fundamentals below the XBRL era (~pre-2009) come from a
 labeled **parsed tier**: each value carries `provenance` (`xbrl` | `parsed`) and, for parsed
@@ -53,7 +53,7 @@ parsed values directly. Definitions: [docs/09-pre-xbrl-fundamentals.md](https://
 | Category | What it pins | Status |
 |---|---|---|
 | `fundamentals` | As-reported vs. restated, point-in-time (XBRL + labeled parsed tier) | **active** (GE; Enron Q3-2001 + WorldCom Q1-2002 via the parsed tier) |
-| `index_membership` | Survivorship-free S&P 500 membership | **active** (Lehman, Tesla) |
+| `index_membership` | Survivorship-free S&P 500 + DJIA membership | **active** (SP500: Lehman, Tesla; DJIA: Apple 2015 inclusion, GE 2018 removal) |
 | `filing_lineage` | Amendment chains via accession linkage | **active** (GE FY2005 10-K/A) |
 | `earnings_events` | 8-K timestamps + as-reported figures | **active** timestamps/as-reported; realized-vs-implied skipped (options, 6f) |
 | `corporate_actions` | Point-in-time split/spinoff adjustment | skipped (raw prices out of redistributable scope) |

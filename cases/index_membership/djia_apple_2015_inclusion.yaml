@@ -1,0 +1,25 @@
+case: djia_apple_2015_inclusion
+tool: get_index_constituents
+description: >
+  DJIA membership must reflect Apple's (AAPL) inclusion effective 2015-03-19: absent as
+  known on 2015-03-18, present as known on 2015-03-19. The same swap removes AT&T (T).
+provenance: |
+  S&P Dow Jones Indices announced that Apple would replace AT&T in the Dow Jones Industrial
+  Average effective at the open on Thursday, March 19, 2015 (announcement 2015-03-06). A
+  point-in-time query must exclude AAPL before the effective date and include it on/after it —
+  testing the announce-ahead distinction (effective date, not announcement date, governs
+  membership). Primary chronology cross-checked against the Wikipedia historical-components
+  table and live ptdata reconstruction (source: wikipedia-djia+efts); AAPL valid_from =
+  2015-03-19, T valid_to = 2015-03-19 (half-open [valid_from, valid_to)).
+steps:
+  - request: {index: DJIA, as_of_date: "2015-03-18"}
+    expect:
+      - {path: tickers, op: not_contains, value: AAPL}
+      - {path: tickers, op: contains, value: T}
+  - request: {index: DJIA, as_of_date: "2015-03-19"}
+    expect:
+      - {path: tickers, op: contains, value: AAPL}
+      - {path: tickers, op: not_contains, value: T}
+cross:
+  - {left: "0.tickers", op: ne, right: "1.tickers"}
+lineage_required: true
