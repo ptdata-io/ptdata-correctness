@@ -1,0 +1,22 @@
+case: djt_uber_2024_inclusion
+tool: get_index_constituents
+description: >
+  Uber joins the Dow Jones Transportation Average effective 2024-02-26, replacing JetBlue.
+  Point-in-time membership must show JBLU present and UBER absent on 2024-02-25, and the reverse
+  on 2024-02-26.
+provenance: |
+  S&P Dow Jones Indices announced Uber would replace JetBlue in the DJTA effective
+  February 26, 2024 (press release 2024-02-20). Verified against ptdata reconstruction
+  (source wikipedia-djt+efts) on 2026-07-12.
+steps:
+  - request: {index: DJT, as_of_date: "2024-02-25"}
+    expect:
+      - {path: tickers, op: not_contains, value: UBER}
+      - {path: tickers, op: contains, value: JBLU}
+  - request: {index: DJT, as_of_date: "2024-02-26"}
+    expect:
+      - {path: tickers, op: contains, value: UBER}
+      - {path: tickers, op: not_contains, value: JBLU}
+cross:
+  - {left: "0.tickers", op: ne, right: "1.tickers"}
+lineage_required: true
