@@ -1,0 +1,22 @@
+case: ndx_dash_2024_inclusion
+tool: get_index_constituents
+description: >
+  DoorDash (DASH) appears in the Nasdaq-100 free monthly reconstruction on 2024-01-01
+  (first snapshot after the late-2023 rebalance window) and is absent on 2023-12-31.
+  Demonstrates survivorship-free as-of-date NDX membership at monthly grain.
+provenance: |
+  ptdata NDX membership is reconstructed from yfiua monthly nasdaq100 snapshots
+  (coverage ~2023-07→present), not an official Nasdaq constituent feed. Add/remove
+  dates are the snapshot month when first observed — here 2024-01-01 — not necessarily
+  the exchange's exact rebalance effective date. Verified in ptdata DB 2026-07-12
+  (source yfiua-ndx+efts).
+steps:
+  - request: {index: NDX, as_of_date: "2023-12-31"}
+    expect:
+      - {path: tickers, op: not_contains, value: DASH}
+  - request: {index: NDX, as_of_date: "2024-01-01"}
+    expect:
+      - {path: tickers, op: contains, value: DASH}
+cross:
+  - {left: "0.tickers", op: ne, right: "1.tickers"}
+lineage_required: true
