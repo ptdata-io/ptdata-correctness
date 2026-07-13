@@ -1,0 +1,22 @@
+case: dju_vistra_2024_inclusion
+tool: get_index_constituents
+description: >
+  Vistra (VST) joins the Dow Jones Utility Average effective 2024-11-08, replacing AES.
+  Point-in-time membership must show AES present and VST absent on 2024-11-07, and the reverse
+  on 2024-11-08.
+provenance: |
+  S&P Dow Jones Indices announced Vistra would replace AES in the DJUA effective
+  November 8, 2024. Verified against ptdata reconstruction (source wikipedia-dju+efts)
+  on 2026-07-12.
+steps:
+  - request: {index: DJU, as_of_date: "2024-11-07"}
+    expect:
+      - {path: tickers, op: not_contains, value: VST}
+      - {path: tickers, op: contains, value: AES}
+  - request: {index: DJU, as_of_date: "2024-11-08"}
+    expect:
+      - {path: tickers, op: contains, value: VST}
+      - {path: tickers, op: not_contains, value: AES}
+cross:
+  - {left: "0.tickers", op: ne, right: "1.tickers"}
+lineage_required: true
