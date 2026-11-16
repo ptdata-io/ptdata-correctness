@@ -8,7 +8,7 @@ description: >
 provenance: |
   NVIDIA reported Q1 FY2024 on 2023-05-24 after the close; revenue ~$7.19B. The point-in-time
   claim still open is the expected move read from the option chain as it stood at the
-  2023-05-23 close (T-1). ptdata does not serve a realized price reaction.
+  2023-05-23 close (T-1). ptdata does not serve prices.
   # VERIFY: exact as-reported revenue/EPS against the 2023-05-24 press release / 8-K.
 request:
   ticker: NVDA

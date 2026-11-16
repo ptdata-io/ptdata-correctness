@@ -7,7 +7,7 @@ description: >
 provenance: |
   Meta reported Q4 2021 on 2022-02-02 after the close; revenue ~$33.67B. Ticker was FB at
   the time (renamed META 2022-06-09) — the security-identifier history must resolve FB for
-  this date. ptdata does not serve a realized price reaction.
+  this date. ptdata does not serve prices.
   # VERIFY: exact as-reported revenue/EPS against the 2022-02-02 press release / 8-K.
 request:
   ticker: FB
